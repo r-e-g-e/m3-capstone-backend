@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:db.sqlite"
+}
+
+model User {
+  id        String    @id @unique @default(uuid())
+  name      String
+  email     String    @unique
+  password  String
+  cpf       String    @unique
+  role      String    @default("USER")
+
+  @@map("users")
+}
+
+model Collect {
+  id        String    @id @unique @default(uuid())
+  name      String
+  state     String
+  capital   String
+  mapsLink  String?   @map("maps_link")
+  latitude  Float?
+  longitude Float?
+  
+  cards     Card[]
+
+  @@map("collects")
+}
+
+model Card {
+  id        String    @id @unique @default(uuid())
+  collectId String
+  name      String
+  itens     String?
+
+  collect   Collect   @relation(fields: [collectId], references: [id], onDelete:Cascade, onUpdate:Cascade)
+
+  @@map("cards")
+}
