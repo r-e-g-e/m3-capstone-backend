@@ -62,21 +62,6 @@ class CardService{
     return
   }
 
-  async createCardItem(id:string, itemData:ICardItemDataCreate){
-    const card = await prismaClient.card.findUnique({where:{id}})
-
-    if(!card) throw new ErrorHTTP("card not found")
-
-    card.item = JSON.stringify({...itemData})
-    
-    await prismaClient.card.update({
-      where:{id},
-      data: card
-    })
-
-    return itemData
-  }
-
   async updateCardItem(id:string, name = "", itemData:ICardItemDataUpdate){
     const card = await prismaClient.card.findUnique({where:{id}})
 

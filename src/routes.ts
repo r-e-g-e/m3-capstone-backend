@@ -22,6 +22,5 @@ routes.get("/collect/:collectId/card", cardController.getCardsFromCollectId)
 routes.delete("/card/:cardId", cardController.deleteCard)
 
 routes.put("/card/:cardId/item", cardController.updateCardItem)
-// routes.delete("/card/:cardId/item", cardController.setCardItem)
 
 export { routes }
