@@ -8,7 +8,6 @@ export const getBearerTokenMiddleware = (req:Request, res:Response, next:NextFun
     return res.status(401).json({error:"Unauthorized"})
   }
     
-  
   try {
     token = token.replace("Bearer ", "")
 
