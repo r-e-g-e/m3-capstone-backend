@@ -39,7 +39,7 @@ model Card {
   id        String    @id @unique @default(uuid())
   collectId String
   name      String
-  itens     String?
+  item      String
 
   collect   Collect   @relation(fields: [collectId], references: [id], onDelete:Cascade, onUpdate:Cascade)
 

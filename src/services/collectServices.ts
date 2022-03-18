@@ -58,7 +58,8 @@ class CollectService{
 
     return {
       collects,
-      totalPages
+      totalPages,
+      currentPage: page
     }
   }
 

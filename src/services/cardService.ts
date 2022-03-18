@@ -1,15 +1,20 @@
 import ErrorHTTP from "../errors/errorWithHTTPCode"
 import { prismaClient } from "../prisma/client"
 
-interface ISetCardItem{
-  meta: number
-  currentAmount?: number
+interface ICardItemDataCreate{
+  goal: number
   isMoney: boolean
   type: string
 }
 
+interface ICardItemDataUpdate{
+  name?: string
+  goal?: number
+  currentAmount?: number
+}
+
 class CardService{
-  async createCard(collectId:string, cardName:string){
+  async createCard(collectId:string, cardName:string, itemData:ICardItemDataCreate){
     const collect = await prismaClient.collect.findUnique({where:{id: collectId}})
 
     if(!collect){
@@ -19,19 +24,30 @@ class CardService{
     const card = await prismaClient.card.create({
       data:{
         collectId: collect.id,
-        name:cardName
+        name:cardName,
+        item: JSON.stringify({
+          ...itemData,
+          currentAmount: 0
+        })
       }
     })
+
+    card.item = JSON.parse(card.item)
 
     return card
   }
 
   async getCardsFromCollectId(collectId:string){
-    const cards = await prismaClient.card.findMany({where:{collectId}})
+
+    const [cards, doCollectExists] = await Promise.all([
+      prismaClient.card.findMany({where:{collectId}}),
+      prismaClient.collect.findUnique({where:{id: collectId}})
+    ])
+
+    if(!doCollectExists) throw new ErrorHTTP("collect not found", 404)
+
     return cards.map( card =>{
-      if(card.itens){
-        card.itens = JSON.parse(card.itens)
-      }
+      card.item = JSON.parse(card.item)
 
       return card
     })
@@ -46,10 +62,12 @@ class CardService{
     return
   }
 
-  async setCardItem(id:string, itemData:ISetCardItem){
+  async createCardItem(id:string, itemData:ICardItemDataCreate){
     const card = await prismaClient.card.findUnique({where:{id}})
 
-    card.itens = JSON.stringify({...itemData})
+    if(!card) throw new ErrorHTTP("card not found")
+
+    card.item = JSON.stringify({...itemData})
     
     await prismaClient.card.update({
       where:{id},
@@ -57,6 +75,39 @@ class CardService{
     })
 
     return itemData
+  }
+
+  async updateCardItem(id:string, name = "", itemData:ICardItemDataUpdate){
+    const card = await prismaClient.card.findUnique({where:{id}})
+
+    if(!card) throw new ErrorHTTP("card not found!", 404)
+
+    if(name) card.name = name
+
+    const parsedItem = JSON.parse(card.item)
+
+    for(const [key, value] of Object.entries(itemData)){
+      if(value) {
+        if(key === "currentAmount" && value > parsedItem.goal){
+          parsedItem[key] = parsedItem.goal
+        }
+        else{
+          parsedItem[key] = value
+        }
+      }
+    }
+
+    card.item = JSON.stringify(parsedItem)
+
+    await prismaClient.card.update({
+      where:{id},
+      data:card
+    })
+
+    return {
+      ...card,
+      item: parsedItem
+    }
   }
 }
 

@@ -2,7 +2,7 @@ import { prismaClient } from "../prisma/client"
 import { hash, compare } from "bcryptjs"
 import { sign } from "jsonwebtoken"
 import ErrorHTTP from "../errors/errorWithHTTPCode"
-// import { user } from ".prisma/client"
+
 
 interface IUserCreation{
   cpf: string
@@ -18,9 +18,13 @@ interface IUserLogIn{
 
 class UserServices {
   public async userCreation({ email, password, name, cpf  }:IUserCreation){
+    const [ emailInUse, cpfInUse ] = await Promise.all([
+      prismaClient.user.findUnique({where:{email}}),
+      prismaClient.user.findUnique({where:{cpf}})
+    ])
 
-    const userAlreadyExist = await prismaClient.user.findUnique({where:{email}})
-    if(userAlreadyExist) throw new ErrorHTTP("Email already in use!")
+    if(emailInUse) throw new ErrorHTTP("Email already in use!")
+    if(cpfInUse) throw new ErrorHTTP("CPF already in use!")
 
     const hashedPassword = await hash(password, 8)
     const createdUser = await prismaClient.user.create({
