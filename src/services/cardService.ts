@@ -22,6 +22,9 @@ class CardService{
   }
 
   async getCardsFromCollectId(collectId:string){
+    // function calcPergentage(total, current){
+
+    // }
 
     const [cards, doCollectExists] = await Promise.all([
       prismaClient.card.findMany({where:{collectId}}),
@@ -30,9 +33,23 @@ class CardService{
 
     if(!doCollectExists) throw new ErrorHTTP("collect not found", 404)
 
+
     return cards.map( card =>{
-      card.itens = JSON.parse(card.itens)
-      return card
+      const parsedItens = JSON.parse(card.itens) as Array<IItem>
+
+      const goal = parsedItens.reduce( (acc, item) => item.goal + acc, 0)
+      const current = parsedItens.reduce( (acc, item) => item.currentAmount + acc, 0)
+
+      console.log(goal, current)
+
+      const percentage = ((current * 100) / goal).toFixed(2)
+
+      delete card.itens
+
+      return {
+        ...card,
+        percentage
+      }
     })
   }
 
