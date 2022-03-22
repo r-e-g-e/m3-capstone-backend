@@ -21,6 +21,7 @@ routes.post("/collect/:collectId/card", cardController.createCard)
 routes.get("/collect/:collectId/card", cardController.getCardsFromCollectId)
 routes.delete("/card/:cardId", cardController.deleteCard)
 
+routes.get("/card/:cardId/item", itemController.getItens)
 routes.post("/card/:cardId/item", itemController.createItem)
 routes.put("/card/:cardId/item/:itemId", itemController.updateItem)
 routes.delete("/card/:cardId/item/:itemId", itemController.deleteItem)

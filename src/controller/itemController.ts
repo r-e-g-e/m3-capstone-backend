@@ -59,6 +59,17 @@ class ItemController{
     return res.sendStatus(204)
   }
 
+  async getItens(req:Request,res:Response){
+    const { cardId } = req.params
+
+    if(!cardId){
+      return res.status(404).json({"error":"card not found!"})
+    }
+
+    const itens = await itemService.getItens(cardId)
+
+    return res.status(200).json(itens)
+  }
 
 }
 

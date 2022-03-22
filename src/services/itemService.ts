@@ -93,6 +93,15 @@ class ItemService{
 
     return true
   }
-} 
 
+  async getItens(cardId:string){
+    const card = await prismaClient.card.findUnique({where:{id: cardId}})
+
+    if(!card) throw new ErrorHTTP("card not found!", 404)
+
+    const parsedItens = JSON.parse(card.itens) as Array<IItem>
+
+    return parsedItens
+  }
+} 
 export default new ItemService()

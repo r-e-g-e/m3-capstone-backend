@@ -40,8 +40,6 @@ class CardService{
       const goal = parsedItens.reduce( (acc, item) => item.goal + acc, 0)
       const current = parsedItens.reduce( (acc, item) => item.currentAmount + acc, 0)
 
-      console.log(goal, current)
-
       const percentage = ((current * 100) / goal).toFixed(2)
 
       delete card.itens
