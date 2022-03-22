@@ -4,18 +4,18 @@ import cardService from "../services/cardService"
 class CardController{
   async createCard(req:Request, res:Response){
     const { collectId } = req.params
-    const { name, goal, isMoney, type } = req.body
+    const { name } = req.body
 
     if(!collectId){
       return res.status(404).json({"error":"collect not found!"})
     }
 
-    if( goal === undefined || isMoney === undefined || !type || !name ) {
+    if( !name ) {
       return res.status(400)
-        .json({"error":"the following fields are required: goal, isMoney, type, currentAmount and name."})
+        .json({"error":"field name is required!"})
     }
 
-    const card = await cardService.createCard(collectId, name, {goal, isMoney, type})
+    const card = await cardService.createCard(collectId, name)
 
     return res.status(201).json(card)
   }
@@ -42,19 +42,6 @@ class CardController{
     await cardService.deleteCardById( cardId )
 
     return res.sendStatus(204)
-  }
-
-  async updateCardItem(req:Request,res:Response){
-    const { cardId } = req.params
-    const { goal, currentAmount, name } = req.body
-
-    if(!cardId){
-      return res.status(404).json({"error":"card not found!"})
-    }
-
-    const item = await cardService.updateCardItem( cardId, name, {goal, currentAmount})
-
-    return res.status(200).json(item)
   }
 }
 
