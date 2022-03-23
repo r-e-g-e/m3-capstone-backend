@@ -22,10 +22,6 @@ class CardService{
   }
 
   async getCardsFromCollectId(collectId:string){
-    // function calcPergentage(total, current){
-
-    // }
-
     const [cards, doCollectExists] = await Promise.all([
       prismaClient.card.findMany({where:{collectId}}),
       prismaClient.collect.findUnique({where:{id: collectId}})
