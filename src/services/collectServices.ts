@@ -78,26 +78,30 @@ class CollectService{
         result.current += parsedItens.reduce( (acc, item) => item.currentAmount + acc, 0)
       }) 
 
-      return result
+      const percentage = ((result.current * 100) / result.goal) || 0
+
+      return {
+        ...collect,
+        percentage: percentage.toFixed(2)
+      }
     })
     
     
     const currentAndGoals = await Promise.all(promises)
 
-    if(!currentAndGoals || !currentAndGoals.length){
-      throw new ErrorHTTP("no itens available", 400)
-    }
+    // if(!currentAndGoals || !currentAndGoals.length){
+    //   throw new ErrorHTTP("no itens available", 400)
+    // }
 
-    const goal = currentAndGoals.reduce( (acc, item) => item.goal + acc, 0)
-    const current = currentAndGoals.reduce( (acc, item) => item.current + acc, 0)
-    const percentage = ((current * 100) / goal).toFixed(2)
+    // const goal = currentAndGoals.reduce( (acc, item) => item.goal + acc, 0)
+    // const current = currentAndGoals.reduce( (acc, item) => item.current + acc, 0)
+    // const percentage = ((current * 100) / goal).toFixed(2)
 
 
     const totalPages = Math.floor(count / perPage)
 
     return {
-      collects,
-      percentage,
+      collects:currentAndGoals,
       totalPages,
       currentPage: page
     }
