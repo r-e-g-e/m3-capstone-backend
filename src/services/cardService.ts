@@ -38,7 +38,7 @@ class CardService{
 
       const percentage = ((current * 100) / goal).toFixed(2)
 
-      delete card.itens
+      card.itens = JSON.parse(card.itens)
 
       return {
         ...card,
