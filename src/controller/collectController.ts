@@ -38,6 +38,7 @@ class CollectController{
 
   async getCollectPagination(req:Request,res:Response){
     const { perPage, page } = req.query
+    const { filter } = req.body
 
     let perPageNumber = Number(perPage)
     let pageNumber = Number(page)
@@ -45,7 +46,7 @@ class CollectController{
     if(isNaN(perPageNumber) || perPageNumber <= 0) perPageNumber = 5
     if(isNaN(pageNumber) || pageNumber < 0) pageNumber = 0
 
-    const collects = await collectServices.getCollectsPagination({perPage:perPageNumber, page:pageNumber})
+    const collects = await collectServices.getCollectsPagination({perPage:perPageNumber, page:pageNumber}, filter)
 
     return res.status(200).json(collects)
   }

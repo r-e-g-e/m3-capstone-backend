@@ -45,12 +45,12 @@ class CollectService{
     return
   }
 
-  async getCollectsPagination({perPage, page}:IGetPagination){
+  async getCollectsPagination({perPage, page}:IGetPagination, filter: string){
     const count = await prismaClient.collect.count()
-    const collects = await prismaClient.collect.findMany({
+    const collects = await prismaClient.collect.findMany(filter !== "*" ? {
       skip: perPage * page,
       take: perPage
-    })
+    } : undefined)
 
     const promises = collects.map( async (collect) => {
       const cardItensArray = await prismaClient.card.findMany({
@@ -88,15 +88,6 @@ class CollectService{
     
     
     const currentAndGoals = await Promise.all(promises)
-
-    // if(!currentAndGoals || !currentAndGoals.length){
-    //   throw new ErrorHTTP("no itens available", 400)
-    // }
-
-    // const goal = currentAndGoals.reduce( (acc, item) => item.goal + acc, 0)
-    // const current = currentAndGoals.reduce( (acc, item) => item.current + acc, 0)
-    // const percentage = ((current * 100) / goal).toFixed(2)
-
 
     const totalPages = Math.floor(count / perPage)
 
